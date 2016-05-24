@@ -3,24 +3,24 @@ package io.getquill.sources
 import scala.reflect.macros.whitebox.Context
 import io.getquill._
 import io.getquill.ast.{ Action => _, Query => _, _ }
+import io.getquill.quotation.QuotationMacro
 import io.getquill.quotation.Quotation
-import io.getquill.quotation.Quoted
 import io.getquill.quotation.FreeVariables
 import io.getquill.util.Messages._
 import io.getquill.quotation.Bindings
 
-trait SourceMacro extends Quotation with ActionMacro with QueryMacro with ResolveSourceMacro {
+trait SourceMacro extends QuotationMacro with ActionMacro with QueryMacro with ResolveSourceMacro {
   val c: Context
   import c.universe.{ Function => _, Ident => _, _ }
 
   protected def prepare(ast: Ast, params: List[Ident]): Tree
 
-  def run[R, S](quoted: Expr[Quoted[Any]])(implicit r: WeakTypeTag[R], s: WeakTypeTag[S]): Tree = runExpr(quoted, true)(r, s)
+  def run[R, S](quoted: Expr[Quotation[Any]])(implicit r: WeakTypeTag[R], s: WeakTypeTag[S]): Tree = runExpr(quoted, true)(r, s)
 
-  def runSingle[R, S](quoted: Expr[Quoted[Any]])(implicit r: WeakTypeTag[R], s: WeakTypeTag[S]): Tree = runExpr(quoted, false)(r, s)
+  def runSingle[R, S](quoted: Expr[Quotation[Any]])(implicit r: WeakTypeTag[R], s: WeakTypeTag[S]): Tree = runExpr(quoted, false)(r, s)
 
-  private def runExpr[R, S](quoted: Expr[Quoted[Any]], returnList: Boolean)(implicit r: WeakTypeTag[R], s: WeakTypeTag[S]): Tree = {
-    implicit val t = c.WeakTypeTag(quoted.actualType.baseType(c.weakTypeOf[Quoted[Any]].typeSymbol).typeArgs.head)
+  private def runExpr[R, S](quoted: Expr[Quotation[Any]], returnList: Boolean)(implicit r: WeakTypeTag[R], s: WeakTypeTag[S]): Tree = {
+    implicit val t = c.WeakTypeTag(quoted.actualType.baseType(c.weakTypeOf[Quotation[Any]].typeSymbol).typeArgs.head)
 
     val ast = this.ast(quoted)
 
@@ -72,7 +72,7 @@ trait SourceMacro extends Quotation with ActionMacro with QueryMacro with Resolv
     else
       c.WeakTypeTag(tpe)
 
-  private def ast[T](quoted: Expr[Quoted[T]]) =
+  private def ast[T](quoted: Expr[Quotation[T]]) =
     unquote[Ast](quoted.tree).getOrElse {
       Dynamic(quoted.tree)
     }

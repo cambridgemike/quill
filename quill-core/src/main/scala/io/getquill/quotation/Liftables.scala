@@ -25,7 +25,7 @@ trait Liftables {
     case Infix(a, b) => q"$pack.Infix($a, $b)"
     case OptionOperation(a, b, c, d) => q"$pack.OptionOperation($a, $b, $c, $d)"
     case If(a, b, c) => q"$pack.If($a, $b, $c)"
-    case Dynamic(tree: Tree) if (tree.tpe <:< c.weakTypeOf[Quoted[Any]]) => q"$tree.ast"
+    case Dynamic(tree: Tree) if (tree.tpe <:< c.weakTypeOf[Quotation[Any]]) => q"$tree.ast"
     case Dynamic(tree: Tree) => q"$pack.Constant($tree)"
     case QuotedReference(tree: Tree, ast) => q"$ast"
     case CompileTimeBinding(tree: Tree) => q"$pack.RuntimeBinding(${tree.toString})"

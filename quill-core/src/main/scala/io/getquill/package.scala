@@ -35,7 +35,7 @@ package object getquill {
 
   def mappedEncoding[I, O](f: I => O) = MappedEncoding(f)
 
-  type Quoted[T] = quotation.Quoted[T]
+  type Quoted[T] = quotation.Quotation[T]
 
   def Ord: OrdOps = NonQuotedException()
 

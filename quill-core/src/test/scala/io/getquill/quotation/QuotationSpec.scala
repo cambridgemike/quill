@@ -704,8 +704,8 @@ class QuotationSpec extends Spec {
         quote(unquote(q2)).ast mustEqual qr1.ast
       }
       "quoted dynamic" in {
-        val i: Quoted[Int] = quote(1)
-        val q: Quoted[Int] = quote(i + 1)
+        val i: Quotation[Int] = quote(1)
+        val q: Quotation[Int] = quote(i + 1)
         quote(unquote(q)).ast mustEqual BinaryOperation(Constant(1), NumericOperator.`+`, Constant(1))
       }
       "abritrary tree" in {
@@ -718,7 +718,7 @@ class QuotationSpec extends Spec {
         quote(unquote(q)).ast mustEqual Constant("a")
       }
       "nested" in {
-        case class Add(i: Quoted[Int]) {
+        case class Add(i: Quotation[Int]) {
           def apply() = quote(i + 1)
         }
         val q = quote {
@@ -893,7 +893,7 @@ class QuotationSpec extends Spec {
 
   "doesn't double quote" in {
     val q = quote(1)
-    val dq: Quoted[Int] = quote(q)
+    val dq: Quotation[Int] = quote(q)
   }
 
   "doesn't a allow quotation of null" in {

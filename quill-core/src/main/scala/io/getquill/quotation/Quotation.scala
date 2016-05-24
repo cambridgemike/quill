@@ -9,13 +9,13 @@ import io.getquill.ast._
 
 import scala.reflect.NameTransformer
 
-trait Quoted[+T] {
+trait Quotation[+T] {
   def ast: Ast
 }
 
 case class QuotedAst(ast: Ast) extends StaticAnnotation
 
-trait Quotation extends Liftables with Unliftables with Parsing {
+trait QuotationMacro extends Liftables with Unliftables with Parsing {
 
   val c: Context
   import c.universe._
@@ -64,7 +64,7 @@ trait Quotation extends Liftables with Unliftables with Parsing {
     val quotation =
       q"""
         {
-          new ${c.weakTypeOf[Quoted[T]]} { 
+          new ${c.weakTypeOf[Quotation[T]]} { 
     
             @${c.weakTypeOf[QuotedAst]}($ast)
             def quoted = ast
@@ -83,12 +83,12 @@ trait Quotation extends Liftables with Unliftables with Parsing {
       """
 
     IsDynamic(ast) match {
-      case true  => q"$quotation: ${c.weakTypeOf[Quoted[T]]}"
+      case true  => q"$quotation: ${c.weakTypeOf[Quotation[T]]}"
       case false => quotation
     }
   }
 
-  def doubleQuote[T: WeakTypeTag](body: Expr[Quoted[T]]) =
+  def doubleQuote[T: WeakTypeTag](body: Expr[Quotation[T]]) =
     body.tree match {
       case q"null" => c.fail("Can't quote null")
       case tree    => q"io.getquill.unquote($tree)"

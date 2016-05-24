@@ -1,6 +1,5 @@
 package io.getquill.sources
 
-import io.getquill.quotation.Quoted
 import io.getquill._
 import io.getquill.TestSource.mirrorSource
 import mirror.Row

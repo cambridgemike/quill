@@ -8,7 +8,7 @@ import io.getquill.util.Messages.RichContext
 import io.getquill.util.Interleave
 
 trait Parsing extends EntityConfigParsing {
-  this: Quotation =>
+  this: QuotationMacro =>
 
   import c.universe.{ Ident => _, Constant => _, Function => _, If => _, Block => _, _ }
 
@@ -103,7 +103,7 @@ trait Parsing extends EntityConfigParsing {
 
   val quotedAstParser: Parser[Ast] = Parser[Ast] {
     case q"$pack.unquote[$t]($quoted)" => astParser(quoted)
-    case t if (t.tpe <:< c.weakTypeOf[Quoted[Any]]) =>
+    case t if (t.tpe <:< c.weakTypeOf[Quotation[Any]]) =>
       unquote[Ast](t) match {
         case Some(ast) if (!IsDynamic(ast)) => QuotedReference(t, Rebind(c)(t, ast, astParser(_)))
         case other                          => Dynamic(t)
@@ -149,7 +149,7 @@ trait Parsing extends EntityConfigParsing {
     case q"$pack.query[$_]($ct)" =>
       Dynamic {
         c.typecheck(q"""
-          new io.getquill.quotation.Quoted[EntityQuery[T]] {
+          new io.getquill.quotation.Quotation[EntityQuery[T]] {
             override def ast = io.getquill.ast.SimpleEntity($ct.runtimeClass.getSimpleName)
           }  
         """)
